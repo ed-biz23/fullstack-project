@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import React from "react";
 import {
   Button,
@@ -13,26 +13,77 @@ import {
   Alert
 } from "reactstrap";
 
+import { useSelector, useDispatch } from "react-redux";
+import { login } from "../../actions/authActions";
+import { clearErrors } from "../../actions/errorActions";
+
 const useModalState = (defaultOpen = false) => {
   const [isOpen, setOpen] = useState(defaultOpen);
-  return { isOpen, toggle: () => setOpen(isOpen => !isOpen) };
+  return {
+    isOpen,
+    toggle: () => {
+      clearErrors();
+      setOpen(isOpen => !isOpen);
+    }
+  };
 };
 
-export default function SignIn({ buttonLabel, className }) {
+export default function SignIn({ buttonLabel }) {
   const { isOpen, toggle } = useModalState();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [msg, setMsg] = useState(null);
+  const mapStateToProps = useSelector(state => ({
+    isAuthenticated: state.auth.isAuthenticated,
+    error: state.error
+  }));
+  const dispatch = useDispatch();
+
+  useEffect(() => {
+    const { error, isAuthenticated } = mapStateToProps;
+    // Check for register error
+    if (error.id === "LOGIN_FAIL") {
+      setMsg(error.msg.msg);
+    }
+
+    // If authenticated, close modal
+    if (isAuthenticated) {
+      setMsg(null);
+      toggle();
+    }
+  }, [mapStateToProps.error, mapStateToProps.isAuthenticated]);
+
+  const onChange = e => {
+    if (e.target.name === "email") {
+      setEmail(e.target.value);
+    } else {
+      setPassword(e.target.value);
+    }
+  };
+
+  const onSubmit = e => {
+    e.preventDefault();
+
+    // Create user object
+    const user = {
+      email,
+      password
+    };
+
+    // Attempt to register
+    dispatch(login(user));
+  };
 
   return (
     <div>
       <Button color="danger" onClick={toggle}>
         {buttonLabel}
       </Button>
-      <Modal isOpen={isOpen} toggle={toggle} className={className}>
+      <Modal isOpen={isOpen} toggle={toggle}>
         <ModalHeader toggle={toggle}>Sign In</ModalHeader>
         <ModalBody>
-          {/* {this.state.msg ? (
-              <Alert color='danger'>{this.state.msg}</Alert>
-            ) : null} */}
-          <Form onSubmit={null}>
+          {msg ? <Alert color="danger">{msg}</Alert> : null}
+          <Form onSubmit={onSubmit}>
             <FormGroup>
               <Label for="email">Email</Label>
               <Input
@@ -41,7 +92,7 @@ export default function SignIn({ buttonLabel, className }) {
                 id="email"
                 placeholder="Email"
                 className="mb-3"
-                onChange={null}
+                onChange={onChange}
               />
 
               <Label for="password">Password</Label>
@@ -51,7 +102,7 @@ export default function SignIn({ buttonLabel, className }) {
                 id="password"
                 placeholder="Password"
                 className="mb-3"
-                onChange={null}
+                onChange={onChange}
               />
               <Button color="dark" style={{ marginTop: "2rem" }} block>
                 Sign In
