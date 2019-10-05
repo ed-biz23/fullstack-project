@@ -1,0 +1,25 @@
+.LandingPage {
+  background: url(../static/bright-chart-data-210607.jpg) no-repeat center
+    center fixed;
+  background-size: cover;
+  min-height: 100vh;
+  min-width: 100vw;
+}
+
+.lp_overlay {
+  z-index: 1;
+  height: 100%;
+  width: 100%;
+  position: fixed;
+  overflow: auto;
+  top: 0px;
+  left: 0px;
+  background: rgba(0, 0, 0, 0.6); /*can be anything, of course*/
+}
+
+.lp_container {
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
