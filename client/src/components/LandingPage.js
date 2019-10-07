@@ -4,10 +4,10 @@ import { Row, Col } from "reactstrap";
 
 import SignIn from "./auth/SignIn";
 import Register from "./auth/Register";
+import { Dashboard } from "./Dashboard";
 
 export const LandingPage = () => {
   const { isLoggedIn } = useSelector(state => state.auth);
-  console.log(isLoggedIn);
   if (!isLoggedIn) {
     return (
       <div className="LandingPage">
@@ -25,6 +25,6 @@ export const LandingPage = () => {
       </div>
     );
   } else {
-    return null;
+    return <Dashboard />;
   }
 };

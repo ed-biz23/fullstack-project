@@ -19,10 +19,11 @@ import { clearErrors } from "../../actions/errorActions";
 
 const useModalState = (defaultOpen = false) => {
   const [isOpen, setOpen] = useState(defaultOpen);
+  const dispatch = useDispatch();
   return {
     isOpen,
     toggle: () => {
-      clearErrors();
+      dispatch(clearErrors());
       setOpen(isOpen => !isOpen);
     }
   };
@@ -44,11 +45,12 @@ export default function SignIn({ buttonLabel }) {
     // Check for register error
     if (error.id === "LOGIN_FAIL") {
       setMsg(error.msg.msg);
+    } else {
+      setMsg(null);
     }
 
     // If authenticated, close modal
     if (isAuthenticated) {
-      setMsg(null);
       toggle();
     }
   }, [mapStateToProps.error, mapStateToProps.isAuthenticated]);

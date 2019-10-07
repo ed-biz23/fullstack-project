@@ -47,7 +47,7 @@ export default function(state = initialState, action) {
         ...state,
         ...action.payload,
         isAuthenticated: true,
-        isLoading: false,
+        isLoggedIn: false,
         isLoading: false
       };
     case AUTH_ERROR:
