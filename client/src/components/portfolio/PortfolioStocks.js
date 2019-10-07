@@ -27,7 +27,7 @@ export const PortfolioStocks = () => {
           <tr key={index}>
             <td>{stock.ticker}</td>
             <td>{stock.shares} Shares</td>
-            <td>${stock.total}</td>
+            <td>${stock.total.toFixed(2)}</td>
           </tr>
         ))}
       </tbody>
