@@ -1,6 +1,5 @@
 # fullstack-project
   - install server dependencies: npm install
-  - install emailing dependencies: npm emailing-install
   - install client dependencies: npm client-install
   - run web app: npm run dev
 
