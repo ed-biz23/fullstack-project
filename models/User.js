@@ -17,7 +17,17 @@ const UserSchema = new Schema({
     type: Number,
     default: 5000
   },
-  tickers: [],
+  tickers: [
+    {
+      name: {
+        type: String,
+        uppercase: true
+      },
+      qty: {
+        type: Number
+      }
+    }
+  ],
   register_date: {
     type: Date,
     default: Date.now

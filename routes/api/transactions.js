@@ -31,27 +31,31 @@ router.get("/", (req, res) => {
 // @access  Private
 router.get("/portfolio", (req, res) => {
   const userId = req.query.userId;
-  User.findById(userId, function(err, user) {
+  User.findById(userId, async function(err, user) {
     if (err) return res.status(400).json({ msg: "Could not find user" });
 
-    let results = await Promise.all(user.tickers.map(async ticker => {
-      result = await axios(
-        `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${ticker}&interval=1min&apikey=${config.get(
-          "alphavantageApi"
-        )}`
-      );
-      const key = Object.keys(result.data["Time Series (1min)"])[0];
-      const openPrice = result.data["Time Series (1min)"][key]["1. open"];
-      const price = result.data["Time Series (1min)"][key]["4. close"];
-      let colorStyle = "grey";
-      if (price > openPrice) {
-        colorStyle = "green";
-      } else if (price < openPrice) {
-        colorStyle = "red";
-      }
-      console.log(1);
-      return { ticker, price, colorStyle };
-    }));
+    let results = await Promise.all(
+      user.tickers.map(async ticker => {
+        result = await axios(
+          `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${
+            ticker.name
+          }&interval=1min&apikey=${config.get("alphavantageApi")}`
+        );
+        const key = Object.keys(result.data["Time Series (1min)"])[0];
+        const openPrice = result.data["Time Series (1min)"][key]["1. open"];
+        const price = parseInt(
+          result.data["Time Series (1min)"][key]["4. close"]
+        ).toFixed(2);
+        let colorStyle = "grey";
+        if (price > openPrice) {
+          colorStyle = "green";
+        } else if (price < openPrice) {
+          colorStyle = "red";
+        }
+
+        return { ticker: ticker.name, qty: ticker.qty, price, colorStyle };
+      })
+    );
     res.json({ results });
   });
 });
@@ -90,8 +94,13 @@ router.post("/purchase", (req, res) => {
       newTransaction.save({}, (err, product) => {
         if (err) return res.status(400).json({ msg: "Transaction failed." });
         user.cash = (cash - price * qty).toFixed(2);
-        if (!user.tickers.includes(ticker)) {
-          user.tickers.push(ticker.toUpperCase());
+        let isTicker = user.tickers.find(
+          ({ name }) => name === ticker.toUpperCase()
+        );
+        if (isTicker) {
+          isTicker.qty += qty;
+        } else {
+          user.tickers.push({ name: ticker, qty: qty });
         }
         user.save();
         res.json({ msg: "Successfully made transaction" });
