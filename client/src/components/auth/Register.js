@@ -23,7 +23,7 @@ const useModalState = (defaultOpen = false) => {
   return {
     isOpen,
     toggle: () => {
-      dispatch(clearErrors());
+      clearErrors();
       setOpen(isOpen => !isOpen);
     }
   };
@@ -51,6 +51,7 @@ export default function Register({ buttonLabel }) {
 
     // If authenticated, close modal
     if (isAuthenticated) {
+      setMsg(null);
       toggle();
     }
   }, [mapStateToProps.error, mapStateToProps.isAuthenticated]);

@@ -17,6 +17,7 @@ const UserSchema = new Schema({
     type: Number,
     default: 5000
   },
+  tickers: [],
   register_date: {
     type: Date,
     default: Date.now
