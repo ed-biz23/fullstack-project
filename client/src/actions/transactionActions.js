@@ -37,3 +37,37 @@ export const loadUserPortfolio = userId => (dispatch, getState) => {
       dispatch(returnErrors(err.response.data, err.response.status));
     });
 };
+
+// Check token & load user transactions
+export const loadUserTransactions = userId => (dispatch, getState) => {
+  axios
+    .get(`/api/transactions?userId=${userId}`, tokenConfig(getState))
+    .then(res =>
+      dispatch({
+        type: GET_TRANSACTIONS,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch(returnErrors(err.response.data, err.response.status));
+    });
+};
+
+// Check token & purchase transactions
+export const purchaseTransaction = props => (dispatch, getState) => {
+  const { ticker, userId, qty } = props;
+  axios
+    .get(
+      `/api/transactions/purchase?userId=${userId}&ticker=${ticker}&qty=${qty}`,
+      tokenConfig(getState)
+    )
+    .then(res =>
+      dispatch({
+        type: ADD_TRANSACTION,
+        payload: res.data
+      })
+    )
+    .catch(err => {
+      dispatch(returnErrors(err.response.data, err.response.status));
+    });
+};

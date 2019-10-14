@@ -10,15 +10,14 @@ import Register from "./auth/Register";
 import { Loading } from "./Loading";
 
 export const LandingPage = () => {
-  const { isLoading, isLoggedIn } = useSelector(state => state.auth);
+  const { isLoading, isAuthenticated } = useSelector(state => state.auth);
   const dispatch = useDispatch();
 
   //   useEffect(() => {
   //     dispatch(loadUser());
   //   }, []);
 
-  if (isLoggedIn) return <Redirect to="/dashboard" />;
-
+  if (isAuthenticated) return <Redirect to="/dashboard" />;
   if (isLoading) return <Loading />;
 
   return (

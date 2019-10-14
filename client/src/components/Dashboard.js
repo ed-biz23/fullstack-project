@@ -6,13 +6,15 @@ import { Container, Row, Col, Button } from "reactstrap";
 import { loadUser, logout } from "../actions/authActions";
 
 import { Portfolio } from "./portfolio/Portfolio";
+import { Transactions } from "./portfolio/Transactions";
 import { Loading } from "./Loading";
 
 export const Dashboard = () => {
-  const { isLoading, isLoggedIn, isAuthenticated } = useSelector(
-    state => state.auth
-  );
+  const { isLoading, isAuthenticated } = useSelector(state => state.auth);
   const dispatch = useDispatch();
+
+  const [portfolioBtn, setPortfolioBtn] = useState(true);
+  const [transactionsBtn, setTransactionsBtn] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated) dispatch(loadUser());
@@ -22,7 +24,17 @@ export const Dashboard = () => {
     dispatch(logout());
   };
 
-  if (!isLoggedIn) return <Redirect to="/" />;
+  const handlePortfolioBtnOnClick = () => {
+    setPortfolioBtn(!portfolioBtn);
+    setTransactionsBtn(!transactionsBtn);
+  };
+
+  const handleTransactionsBtnOnClick = () => {
+    setTransactionsBtn(!transactionsBtn);
+    setPortfolioBtn(!portfolioBtn);
+  };
+
+  if (!isAuthenticated) return <Redirect to="/" />;
 
   if (isLoading) return <Loading />;
 
@@ -35,16 +47,24 @@ export const Dashboard = () => {
               Sign Out
             </Button>
           </Col>
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
-            {/* <Col xs="auto"> */}
-            <Button color="primary">Portfolio </Button>
-            {/* </Col> */}
-            {/* <Col xs="auto"> */}
-            <Button color="primary">Transactions</Button>
-            {/* </Col> */}
-          </div>
         </Row>
-        <Portfolio />
+        <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <Button
+            color="primary"
+            disabled={portfolioBtn}
+            onClick={handlePortfolioBtnOnClick}
+          >
+            Portfolio{" "}
+          </Button>
+          <Button
+            color="primary"
+            disabled={transactionsBtn}
+            onClick={handleTransactionsBtnOnClick}
+          >
+            Transactions
+          </Button>
+        </div>
+        {portfolioBtn ? <Portfolio /> : <Transactions />}
       </Container>
     </div>
   );
