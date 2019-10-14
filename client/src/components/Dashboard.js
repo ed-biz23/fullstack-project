@@ -10,14 +10,16 @@ import { Transactions } from "./portfolio/Transactions";
 import { Loading } from "./Loading";
 
 export const Dashboard = () => {
-  const { isLoading, isAuthenticated } = useSelector(state => state.auth);
+  const { isLoading, user, isAuthenticated } = useSelector(state => state.auth);
   const dispatch = useDispatch();
 
   const [portfolioBtn, setPortfolioBtn] = useState(true);
   const [transactionsBtn, setTransactionsBtn] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) dispatch(loadUser());
+    setTimeout(() => {
+      if (isAuthenticated && !("cash" in user)) dispatch(loadUser());
+    }, 500);
   }, []);
 
   const onClick = () => {

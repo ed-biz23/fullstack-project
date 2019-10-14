@@ -35,39 +35,43 @@ router.get("/portfolio", auth, (req, res) => {
     if (err) return res.status(400).json({ msg: "Could not find user" });
 
     let portfolioValue = 0;
-    let results = await Promise.all(
-      user.tickers.map(async ticker => {
-        result = await axios(
-          `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${
-            ticker.name
-          }&interval=1min&apikey=${config.get("alphavantageApi")}`
-        );
-        if ("Error Message" in result.data || "Note" in result.data)
-          return res.status(400).json({ msg: result.data });
-        const key = Object.keys(result.data["Time Series (1min)"])[0];
-        const openPrice = result.data["Time Series (1min)"][key]["1. open"];
-        const closePrice = result.data["Time Series (1min)"][key]["1. close"];
-        const totalValue = (
-          ticker.qty *
-          parseInt(result.data["Time Series (1min)"][key]["4. close"])
-        ).toFixed(2);
-        portfolioValue += parseInt(totalValue);
-        let colorStyle = "grey";
-        if (closePrice > openPrice) {
-          colorStyle = "green";
-        } else if (closePrice < openPrice) {
-          colorStyle = "red";
-        }
+    try {
+      let results = await Promise.all(
+        user.tickers.map(async ticker => {
+          result = await axios(
+            `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${
+              ticker.name
+            }&interval=1min&apikey=${config.get("alphavantageApi")}`
+          );
+          if ("Error Message" in result.data || "Note" in result.data)
+            return res.status(400).json({ msg: result.data });
 
-        return {
-          ticker: ticker.name,
-          qty: ticker.qty,
-          totalValue,
-          colorStyle
-        };
-      })
-    );
-    res.json({ results, portfolioValue });
+          const key = Object.keys(result.data["Time Series (1min)"])[0];
+          const openPrice = result.data["Time Series (1min)"][key]["1. open"];
+          const closePrice = result.data["Time Series (1min)"][key]["4. close"];
+          const totalValue = ticker.qty * closePrice;
+          portfolioValue += parseFloat(totalValue);
+          let colorStyle = "grey";
+          if (closePrice > openPrice) {
+            colorStyle = "green";
+          } else if (closePrice < openPrice) {
+            colorStyle = "red";
+          }
+
+          return {
+            ticker: ticker.name,
+            qty: ticker.qty,
+            totalValue,
+            colorStyle
+          };
+        })
+      );
+      res.json({ results, portfolioValue });
+    } catch (err) {
+      return res
+        .status(400)
+        .json({ msg: "Unable to fetch api to get the data." });
+    }
   });
 });
 
@@ -86,38 +90,40 @@ router.get("/purchase", auth, (req, res) => {
       )}`
     )
       .then(result => {
+        if ("Error Message" in result.data)
+          return res.status(400).json({ msg: "Invalid Ticker." });
+
         const cash = user.cash;
         const key = Object.keys(result.data["Time Series (1min)"])[0];
         const price = result.data["Time Series (1min)"][key]["4. close"];
 
-        if (price * qty > cash)
+        if (price * parseInt(qty) > cash)
           return res.statu(400).json({ msg: "Insufficient Funds." });
 
         const newTransaction = new Transaction({
           ticker,
           userId,
-          qty,
+          qty: parseInt(qty),
           price
         });
 
         newTransaction.save({}, (err, product) => {
           if (err) return res.status(400).json({ msg: "Transaction failed." });
-          user.cash = (cash - price * qty).toFixed(2);
+          user.cash = (cash - price * parseInt(qty)).toFixed(3);
           let isTicker = user.tickers.find(
             ({ name }) => name === ticker.toUpperCase()
           );
           if (isTicker) {
             isTicker.qty += parseInt(qty);
           } else {
-            user.tickers.push({ name: ticker, qty: qty });
+            user.tickers.push({ name: ticker, qty: parseInt(qty) });
           }
           user.save();
           res.json({ msg: "Successfully made transaction" });
         });
       })
       .catch(err => {
-        if ("Error Message" in result.data)
-          return res.status(400).json({ msg: "Invalid Ticker." });
+        return res.status(400).json({ msg: result.data });
       });
   });
 });

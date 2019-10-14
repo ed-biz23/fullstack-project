@@ -6,7 +6,7 @@ import { loadUserTransactions } from "../../actions/transactionActions";
 
 export const Transactions = () => {
   const { transactions } = useSelector(state => state.transaction);
-  const { user, isAuthenticated, isLoading } = useSelector(state => state.auth);
+  const { user } = useSelector(state => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => {

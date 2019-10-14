@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Row, Button } from "reactstrap";
 import { useSelector, useDispatch } from "react-redux";
 
+import { loadUser } from "../../actions/authActions";
 import { purchaseTransaction } from "../../actions/transactionActions";
 
 export const BuyStocks = () => {
@@ -13,7 +14,12 @@ export const BuyStocks = () => {
 
   const onClick = () => {
     const userId = user.id || user._id;
-    if (ticker && qty) dispatch(purchaseTransaction({ ticker, qty, userId }));
+    if (ticker && qty > 0) {
+      dispatch(purchaseTransaction({ ticker, qty, userId }));
+      setTimeout(() => {
+        dispatch(loadUser());
+      }, 1000);
+    }
   };
 
   return (
