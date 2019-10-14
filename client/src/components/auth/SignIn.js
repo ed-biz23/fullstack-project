@@ -13,12 +13,11 @@ import {
 } from "reactstrap";
 
 import { useSelector, useDispatch } from "react-redux";
-import { login, loadUser } from "../../actions/authActions";
+import { login } from "../../actions/authActions";
 import { clearErrors } from "../../actions/errorActions";
 
 const useModalState = (defaultOpen = false) => {
   const [isOpen, setOpen] = useState(defaultOpen);
-  const dispatch = useDispatch();
   return {
     isOpen,
     toggle: () => {

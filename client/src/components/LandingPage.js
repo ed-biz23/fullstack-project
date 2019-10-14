@@ -1,9 +1,7 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Redirect } from "react-router-dom";
 import { Row, Col } from "reactstrap";
-import { useSelector, useDispatch } from "react-redux";
-
-import { loadUser } from "../actions/authActions";
+import { useSelector } from "react-redux";
 
 import SignIn from "./auth/SignIn";
 import Register from "./auth/Register";
@@ -11,11 +9,6 @@ import { Loading } from "./Loading";
 
 export const LandingPage = () => {
   const { isLoading, isAuthenticated } = useSelector(state => state.auth);
-  const dispatch = useDispatch();
-
-  //   useEffect(() => {
-  //     dispatch(loadUser());
-  //   }, []);
 
   if (isAuthenticated) return <Redirect to="/dashboard" />;
   if (isLoading) return <Loading />;

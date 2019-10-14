@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Table } from "reactstrap";
 
@@ -6,7 +6,7 @@ import { loadUserPortfolio } from "../../actions/transactionActions";
 
 export const PortfolioStocks = () => {
   const { portfolio } = useSelector(state => state.transaction);
-  const { user, isAuthenticated } = useSelector(state => state.auth);
+  const { user } = useSelector(state => state.auth);
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -16,6 +16,12 @@ export const PortfolioStocks = () => {
         dispatch(loadUserPortfolio(userId));
       }
     }, 500);
+    setInterval(() => {
+      if ("cash" in user) {
+        const userId = user.id || user._id;
+        dispatch(loadUserPortfolio(userId));
+      }
+    }, 60000);
   }, []);
 
   if (!portfolio) return <h1>You Haven't Bought Any Stocks.</h1>;

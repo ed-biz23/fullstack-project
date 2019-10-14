@@ -17,7 +17,6 @@ import { register } from "../../actions/authActions";
 import { clearErrors } from "../../actions/errorActions";
 
 const useModalState = (defaultOpen = false) => {
-  const dispatch = useDispatch();
   const [isOpen, setOpen] = useState(defaultOpen);
   return {
     isOpen,

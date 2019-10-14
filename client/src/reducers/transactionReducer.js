@@ -1,8 +1,4 @@
-import {
-  GET_PORTFOLIO,
-  GET_TRANSACTIONS,
-  ADD_TRANSACTION
-} from "../actions/types";
+import { GET_PORTFOLIO, GET_TRANSACTIONS } from "../actions/types";
 
 const initialState = {
   transactions: null,
