@@ -19,12 +19,12 @@ export const loadUser = () => (dispatch, getState) => {
 
   axios
     .get("/api/auth/user", tokenConfig(getState))
-    .then(res =>
+    .then(res => {
       dispatch({
         type: USER_LOADED,
         payload: res.data
-      })
-    )
+      });
+    })
     .catch(err => {
       dispatch(returnErrors(err.response.data, err.response.status));
       dispatch({
@@ -77,12 +77,12 @@ export const login = ({ email, password }) => dispatch => {
 
   axios
     .post("/api/auth", body, config)
-    .then(res =>
+    .then(res => {
       dispatch({
         type: LOGIN_SUCCESS,
         payload: res.data
-      })
-    )
+      });
+    })
     .catch(err => {
       dispatch(
         returnErrors(err.response.data, err.response.status, "LOGIN_FAIL")

@@ -11,7 +11,7 @@ const User = require("../../models/User");
 // @route   GET api/transactions
 // @desc    Auth user's transactions
 // @access  Private
-router.get("/", (req, res) => {
+router.get("/", auth, (req, res) => {
   const userId = req.query.userId;
   Transaction.aggregate(
     [{ $match: { userId } }, { $sort: { transaction_date: -1 } }],
@@ -29,7 +29,7 @@ router.get("/", (req, res) => {
 // @route   GET api/transactions/portfolio
 // @desc    Auth user's transactions
 // @access  Private
-router.get("/portfolio", (req, res) => {
+router.get("/portfolio", auth, (req, res) => {
   const userId = req.query.userId;
   User.findById(userId, async function(err, user) {
     if (err) return res.status(400).json({ msg: "Could not find user" });
@@ -43,8 +43,9 @@ router.get("/portfolio", (req, res) => {
         );
         const key = Object.keys(result.data["Time Series (1min)"])[0];
         const openPrice = result.data["Time Series (1min)"][key]["1. open"];
-        const price = parseInt(
-          result.data["Time Series (1min)"][key]["4. close"]
+        const totalValue = (
+          ticker.qty *
+          parseInt(result.data["Time Series (1min)"][key]["4. close"])
         ).toFixed(2);
         let colorStyle = "grey";
         if (price > openPrice) {
@@ -53,7 +54,7 @@ router.get("/portfolio", (req, res) => {
           colorStyle = "red";
         }
 
-        return { ticker: ticker.name, qty: ticker.qty, price, colorStyle };
+        return { ticker: ticker.name, qty: ticker.qty, totalValue, colorStyle };
       })
     );
     res.json({ results });
@@ -63,7 +64,7 @@ router.get("/portfolio", (req, res) => {
 // @route   POST api/transactions
 // @desc    Auth user's transaction
 // @access  Private
-router.post("/purchase", (req, res) => {
+router.post("/purchase", auth, (req, res) => {
   const { ticker, userId, qty } = req.body;
 
   axios(
@@ -79,6 +80,7 @@ router.post("/purchase", (req, res) => {
 
       const cash = user.cash;
       const key = Object.keys(result.data["Time Series (1min)"])[0];
+      console.log(key);
       const price = result.data["Time Series (1min)"][key]["4. close"];
 
       if (price * qty > cash)

@@ -9,12 +9,11 @@ import {
   FormGroup,
   Label,
   Input,
-  NavLink,
   Alert
 } from "reactstrap";
 
 import { useSelector, useDispatch } from "react-redux";
-import { login } from "../../actions/authActions";
+import { login, loadUser } from "../../actions/authActions";
 import { clearErrors } from "../../actions/errorActions";
 
 const useModalState = (defaultOpen = false) => {
@@ -73,7 +72,7 @@ export default function SignIn({ buttonLabel }) {
       password
     };
 
-    // Attempt to register
+    // Attempt to sign in
     dispatch(login(user));
   };
 

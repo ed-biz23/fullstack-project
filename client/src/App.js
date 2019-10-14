@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { Spinner } from "reactstrap";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Switch, Route, Link } from "react-router-dom";
 import "./css/App.css";
 
 import { Provider } from "react-redux";
@@ -7,21 +7,7 @@ import store from "./store";
 import { loadUser } from "./actions/authActions";
 
 import { LandingPage } from "./components/LandingPage";
-
-const Loading = () => {
-  return (
-    <div>
-      <Spinner color="primary" />
-      <Spinner color="secondary" />
-      <Spinner color="success" />
-      <Spinner color="danger" />
-      <Spinner color="warning" />
-      <Spinner color="info" />
-      <Spinner color="light" />
-      <Spinner color="dark" />
-    </div>
-  );
-};
+import { Dashboard } from "./components/Dashboard";
 
 function App() {
   useEffect(() => {
@@ -29,11 +15,18 @@ function App() {
   });
 
   return (
-    <Provider store={store}>
-      <div className="App">
-        <LandingPage />
-      </div>
-    </Provider>
+    <Router>
+      <Provider store={store}>
+        <Switch>
+          <Route path="/dashboard">
+            <Dashboard />
+          </Route>
+          <Route path="/">
+            <LandingPage />
+          </Route>
+        </Switch>
+      </Provider>
+    </Router>
   );
 }
 
